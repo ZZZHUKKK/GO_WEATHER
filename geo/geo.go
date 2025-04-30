@@ -17,10 +17,13 @@ type CityExistance struct {
 	Error bool `json:"error"`
 }
 
+var ErrNoCity = errors.New("NOCITY")
+var ErrNot200 = errors.New("BAD_STATUS_CODE")
+
 func GetMyGeo(city string) (*GeoStruct, error) {
 	if city != "" {
 		if isExist := CheckCity(city); !isExist {
-			return nil, errors.New("NOCITY")
+			return nil, ErrNoCity
 		}
 		return &GeoStruct{City: city}, nil
 	}
@@ -31,8 +34,7 @@ func GetMyGeo(city string) (*GeoStruct, error) {
 	}
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		errorBody, _ := io.ReadAll(response.Body)
-		return nil, fmt.Errorf("status %d: %s", response.StatusCode, errorBody)
+		return nil, ErrNot200
 	}
 
 	body, err := io.ReadAll(response.Body)

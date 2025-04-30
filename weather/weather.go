@@ -1,6 +1,7 @@
 package weather
 
 import (
+	"errors"
 	"fmt"
 	"go/weather/geo"
 	"io"
@@ -8,7 +9,12 @@ import (
 	"net/url"
 )
 
+var ErrFormat = errors.New("INCORRECT_FORMAT")
+
 func GetWeather(geo *geo.GeoStruct, format int) (string, error) {
+	if format < 1 || format > 4 {
+		return "", ErrFormat
+	}
 	baseUrl, err := url.Parse("https://wttr.in/" + geo.City)
 	if err != nil {
 		return "", fmt.Errorf("HTTP request failed: %v", err)
